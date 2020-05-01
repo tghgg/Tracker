@@ -16,8 +16,7 @@ p {
 }
 
 ul {
-    display: table;
-    margin: 0 auto;
+    padding: 0;
 }
 
 #add_button {
@@ -29,5 +28,20 @@ ul {
 }
 
 button {
-    font-family: monospace;
+	background-color:transparent;
+	border:1px solid #525252;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family: monospace, 'Roboto';
+	font-size: 1rem;
+	padding:5px 7px;
+	text-decoration:none;
+}
+button:hover {
+	background-color:transparent;
+}
+button:active {
+	position:relative;
+	top:1px;
 }

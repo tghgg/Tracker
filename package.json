@@ -1,11 +1,14 @@
 {
   "name": "tracker",
-  "version": "0.0.01",
+  "version": "0.0.1",
   "description": "",
   "main": "./src/main/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "start": "electron .",
+    "pack": "electron-builder -wl",
+    "semistandard": "semistandard --fix",
+    "pack_windows": "electron-builder -w",
+    "pack_linux": "electron-builder -l"
   },
   "author": "Falling Snowdin",
   "license": "MIT",
