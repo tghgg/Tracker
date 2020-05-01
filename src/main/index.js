@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 
-let MainWindow;
+let MainWindow, InputWindow;
 
 app.on('ready', () => {
     MainWindow = new BrowserWindow(
@@ -13,24 +13,27 @@ app.on('ready', () => {
           enableRemoteModule: false
         }
       );
-    MainWindow.loadFile('./src/index.html');
+    MainWindow.loadFile('./src/main/index.html');
 });
 
 // Create input window to get new task info
 ipcMain.on('add-task', (event, data) => {
     console.log('Add new task');
-    let InputWindow = new BrowserWindow({
-        width: 400,
-        hegiht: 300,
-        backgroundColor: '#000',
+    InputWindow = new BrowserWindow({
+        width: 300,
+        hegiht: 200,
+        // backgroundColor: '#000',
         show: true,
         webPreferences: { nodeIntegration: true },
         enableRemoteModule: false,
-        parent: MainWindow
+        parent: MainWindow,
+        autoHideMenuBar: true,
+        modal: true,
     });
-    InputWindow.loadFile('./src/renderer/input_window.html');
+    InputWindow.loadFile('./src/subwindows/input_window.html');
 });
 
 ipcMain.on('create-task', (event, data) => {
-  console.log(data);
+  InputWindow.close();
+  MainWindow.webContents.send('add-task-to-list', data);
 });
