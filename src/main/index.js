@@ -21,7 +21,7 @@ ipcMain.on('add-task', (event, data) => {
     console.log('Add new task');
     InputWindow = new BrowserWindow({
         width: 300,
-        hegiht: 200,
+        height: 200,
         // backgroundColor: '#000',
         show: true,
         webPreferences: { nodeIntegration: true },

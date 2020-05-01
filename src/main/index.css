@@ -1,20 +1,33 @@
 body {
     text-align: center;
+    font-family: 'Roboto', sans-serif;
     color: white;
+    overflow: hidden;
 }
 
 p {
     color: white;
 }
 
+.main {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 ul {
-    display: inline-block;
-    text-align: center;
+    display: table;
+    margin: 0 auto;
 }
 
 #add_button {
     position: absolute;
     bottom: 5%;
-    width: 50%;
-    margin: 0 auto;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+button {
+    font-family: monospace;
 }
