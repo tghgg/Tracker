@@ -15,25 +15,37 @@ app.on('ready', () => {
       width: 800,
       height: 600,
       backgroundColor: '#1d1d1d',
-      show: true,
+      show: false,
       webPreferences: { nodeIntegration: true },
       enableRemoteModule: false
     }
   );
   MainWindow.loadFile('./src/main/index.html');
 
-  if (!data_handler.existsSync(task_history_path)) {
-    data_handler.create(task_history_path, JSON.stringify({
-      tasks: []
-    }), (err) => {
-      if (err) dialog.showErrorBox('Error', `${err}\nError intializing tasks history JSON file.`);
-    });
-  }
+
+  MainWindow.on('ready-to-show', () => {
+    MainWindow.show();
+    MainWindow.webContents.openDevTools();
+
+    if (!data_handler.existsSync(task_history_path)) {
+      console.log('Initialize task history');
+      data_handler.create(task_history_path, JSON.stringify({
+        tasks: [],
+      }), (err) => {
+        if (err) dialog.showErrorBox('Error', `${err}\nError intializing tasks history JSON file.`);
+      });
+    } else {
+      console.log('Task history exists');
+      const task_history = JSON.parse(data_handler.readSync(task_history_path))['tasks'];
+      console.log(task_history);
+      MainWindow.webContents.send('existing-tasks', task_history);
+    }
+  });
+  
 });
 
 // Create input window to get new task info
 ipcMain.on('add-task', (event, data) => {
-  console.log('Add new task');
   InputWindow = new BrowserWindow({
     width: 300,
     height: 200,
@@ -48,15 +60,23 @@ ipcMain.on('add-task', (event, data) => {
   InputWindow.loadFile('./src/subwindows/input_window.html');
 });
 
-// Actually create the task; save the task locally in a JSON file
+// Actually create the task; add the task to task history
 ipcMain.on('create-task', (event, data) => {
   InputWindow.close();
   MainWindow.webContents.send('add-task-to-list', data);
   const current_task_history = JSON.parse(data_handler.readSync(task_history_path));
-  console.log(typeof(current_task_history));
   current_task_history['tasks'].push(data);
-  console.log(current_task_history);
   data_handler.create(task_history_path, JSON.stringify(current_task_history), (err) => {
     if (err) dialog.showErrorBox('Error', `${err}\nError updating task history.`);
+  });
+});
+
+// Remove task from task history
+ipcMain.on('remove-task', (event, data) => {
+  console.log(data);
+  const task_history = JSON.parse(data_handler.readSync(task_history_path));
+  task_history['tasks'].splice(task_history['tasks'].indexOf(data), 1);
+  data_handler.create(task_history_path, JSON.stringify(task_history), (err) => {
+    if (err) dialog.showErrorBox('Error', `${err}\nFailed to delete task from task history.`);
   });
 });
