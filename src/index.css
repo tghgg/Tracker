@@ -1,0 +1,20 @@
+body {
+    text-align: center;
+    color: white;
+}
+
+p {
+    color: white;
+}
+
+ul {
+    display: inline-block;
+    text-align: center;
+}
+
+#add_button {
+    position: absolute;
+    bottom: 5%;
+    width: 50%;
+    margin: 0 auto;
+}
