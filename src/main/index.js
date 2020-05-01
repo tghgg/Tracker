@@ -28,5 +28,9 @@ ipcMain.on('add-task', (event, data) => {
         enableRemoteModule: false,
         parent: MainWindow
     });
-    InputWindow.loadFile('./src/InputWindow.html');
-})
+    InputWindow.loadFile('./src/renderer/input_window.html');
+});
+
+ipcMain.on('create-task', (event, data) => {
+  console.log(data);
+});
