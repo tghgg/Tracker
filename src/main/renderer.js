@@ -52,8 +52,7 @@ ipcRenderer.on('add-task-to-list', (event, data) => {
 });
 
 ipcRenderer.on('remove-task-from-list', (event, data) => {
-  console.log(data);
   const tasks = document.querySelectorAll('.task');
-  console.log(tasks);
-  tasks[data].remove();
+  if (tasks.length === 0) tasks[0].remove();
+  else tasks[data].remove();
 });

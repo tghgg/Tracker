@@ -17,7 +17,8 @@ app.on('ready', () => {
       backgroundColor: '#1d1d1d',
       show: false,
       webPreferences: { nodeIntegration: true },
-      enableRemoteModule: false
+      enableRemoteModule: false,
+      autoHideMenuBar: true,
     }
   );
   MainWindow.loadFile('./src/main/index.html');
