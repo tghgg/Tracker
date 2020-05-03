@@ -9,11 +9,13 @@ p {
     color: white;
 }
 
-.main {
+.main, .task {
     width: 100%;
     margin-left: auto;
     margin-right: auto;
 }
+
+
 
 ul {
     padding: 0;

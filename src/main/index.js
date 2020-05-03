@@ -38,7 +38,7 @@ app.on('ready', () => {
       console.log('Task history exists');
       const task_history = JSON.parse(data_handler.readSync(task_history_path))['tasks'];
       console.log(task_history);
-      MainWindow.webContents.send('existing-tasks', task_history);
+      MainWindow.webContents.send('add-task-to-list', task_history);
     }
   });
   
@@ -63,7 +63,7 @@ ipcMain.on('add-task', (event, data) => {
 // Actually create the task; add the task to task history
 ipcMain.on('create-task', (event, data) => {
   InputWindow.close();
-  MainWindow.webContents.send('add-task-to-list', data);
+  MainWindow.webContents.send('add-task-to-list', [data]);
   const current_task_history = JSON.parse(data_handler.readSync(task_history_path));
   current_task_history['tasks'].push(data);
   data_handler.create(task_history_path, JSON.stringify(current_task_history), (err) => {
