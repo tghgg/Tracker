@@ -60,12 +60,20 @@ ipcMain.on('add-task', (event, data) => {
   InputWindow.loadFile('./src/subwindows/input_window.html');
 });
 
-// Actually create the task; add the task to task history
+// Actually create the task, and add the task to task history
 ipcMain.on('create-task', (event, data) => {
   InputWindow.close();
-  MainWindow.webContents.send('add-task-to-list', [data]);
+
   const current_task_history = JSON.parse(data_handler.readSync(task_history_path));
-  current_task_history['tasks'].push(data);
+  const id = 
+  current_task_history['tasks'].push({
+    name: data,
+    id: current_task_history['tasks'].length,
+    completions: 0
+  });
+
+  MainWindow.webContents.send('add-task-to-list', [{name:data,id:current_task_history['tasks'].length,completions:0}]);
+
   data_handler.create(task_history_path, JSON.stringify(current_task_history), (err) => {
     if (err) dialog.showErrorBox('Error', `${err}\nError updating task history.`);
   });
@@ -74,9 +82,33 @@ ipcMain.on('create-task', (event, data) => {
 // Remove task from task history
 ipcMain.on('remove-task', (event, data) => {
   console.log(data);
+  dialog.showMessageBox(MainWindow, {
+    title: 'Confirmation',
+    type: 'question',
+    buttons: ['Cancel', 'Remove'],
+    defaultId: 0,
+    message: 'Remove task?'
+  }).then((result) => {
+    if (result.response === 1) {
+      // Delete from history
+      const task_history = JSON.parse(data_handler.readSync(task_history_path));
+      task_history['tasks'].splice(task_history['tasks'].indexOf(data), 1);
+      data_handler.create(task_history_path, JSON.stringify(task_history), (err) => {
+        if (err) dialog.showErrorBox('Error', `${err}\nFailed to remove task from task history.`);
+      });
+      // Remove from renderer
+      MainWindow.webContents.send('remove-task-from-list', data);
+    }
+  }, (err) => {
+    if (err) dialog.showErrorBox('Error', `${err}\nError removing task.`);
+  });
+});
+
+// Increment a task's completions count
+ipcMain.on('complete-task', (event, data) => {
   const task_history = JSON.parse(data_handler.readSync(task_history_path));
-  task_history['tasks'].splice(task_history['tasks'].indexOf(data), 1);
+  task_history['tasks'][task_history['tasks'].indexOf(data)]['completions']++;
   data_handler.create(task_history_path, JSON.stringify(task_history), (err) => {
-    if (err) dialog.showErrorBox('Error', `${err}\nFailed to delete task from task history.`);
+    if (err) dialog.showErrorBox('Error', `${err}\nFailed to increment task completion count.`);
   });
 });
