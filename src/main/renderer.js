@@ -2,13 +2,15 @@ const { ipcRenderer } = require('electron');
 
 // Create a task containing details and a tracker
 function createTask(data) {
-  for (let i = 0; i < data.length; i++) {
+  console.log(data);
+  console.log('data');
+
+  for (let i = 0; i < data.tasks.length; i++) {
     const task = document.createElement('div');
     task.className = 'task';
-    task.id = `task${data[i]['id']}`;
 
     const button = document.createElement('button');
-    button.innerHTML = data[i]['name'];
+    button.innerHTML = data.tasks[i].name;
     button.className = 'task-button';
 
     // Increment tracker on left click; ask to remove task on right click
@@ -20,17 +22,18 @@ function createTask(data) {
       task_tracker.addEventListener('webkitAnimationEnd', (event) => {
         task_tracker.classList.remove('pop');
       });
-      ipcRenderer.send('complete-task', data[i]['id']);
+      if ('current_task_index' in data) ipcRenderer.send('complete-task', data.current_task_index);
+      else ipcRenderer.send('complete-task', i);
     });
     button.addEventListener('contextmenu', (event) => {
       event.preventDefault();
-      console.log(event.target.parentElement);
-      ipcRenderer.send('remove-task', data[i]['id']);
+      if ('current_task_index' in data) ipcRenderer.send('remove-task', data.current_task_index);
+      else ipcRenderer.send('remove-task', i);
     });
 
     const tracker = document.createElement('h3');
     tracker.className = 'task-tracker';
-    tracker.textContent = data[i]['completions'];
+    tracker.textContent = data.tasks[i].completions;
 
     task.appendChild(button);
     task.appendChild(tracker);
@@ -50,4 +53,7 @@ ipcRenderer.on('add-task-to-list', (event, data) => {
 
 ipcRenderer.on('remove-task-from-list', (event, data) => {
   console.log(data);
+  const tasks = document.querySelectorAll('.task');
+  console.log(tasks);
+  tasks[data].remove();
 });
