@@ -25,7 +25,7 @@ app.on('ready', () => {
 
   MainWindow.on('ready-to-show', () => {
     MainWindow.show();
-    MainWindow.webContents.openDevTools();
+    // MainWindow.webContents.openDevTools();
 
     if (!data_handler.existsSync(task_history_path)) {
       console.log('Initialize task history');

@@ -10,7 +10,7 @@ function createTask(data) {
       event.currentTarget.remove();
       ipcRenderer.send('remove-task', event.currentTarget.innerHTML);
     });
-    document.querySelector('ul').appendChild(new_item);
+    document.querySelector('.main').appendChild(new_item);
   }
 }
 
