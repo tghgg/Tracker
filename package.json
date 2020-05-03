@@ -1,7 +1,7 @@
 {
   "name": "tracker",
-  "version": "0.0.1",
-  "description": "",
+  "version": "0.1.0",
+  "description": "Simple habit tracker",
   "main": "./src/main/index.js",
   "scripts": {
     "start": "electron .",
@@ -9,6 +9,20 @@
     "semistandard": "semistandard --fix",
     "pack_windows": "electron-builder -w",
     "pack_linux": "electron-builder -l"
+  },
+  "build": {
+    "appId": "me.tasktracker.Tracker",
+    "productName": "Task Tracker",
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Office",
+      "executableName": "Task Tracker"
+    },
+    "win": {
+      "target": "NSIS"
+    }
   },
   "author": "Falling Snowdin",
   "license": "MIT",

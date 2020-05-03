@@ -18,11 +18,10 @@ app.on('ready', () => {
       show: false,
       webPreferences: { nodeIntegration: true },
       enableRemoteModule: false,
-      autoHideMenuBar: true,
+      autoHideMenuBar: true
     }
   );
   MainWindow.loadFile('./src/main/index.html');
-
 
   MainWindow.on('ready-to-show', () => {
     MainWindow.show();
@@ -31,17 +30,16 @@ app.on('ready', () => {
     if (!data_handler.existsSync(task_history_path)) {
       console.log('Initialize task history');
       data_handler.create(task_history_path, JSON.stringify({
-        tasks: [],
+        tasks: []
       }), (err) => {
         if (err) dialog.showErrorBox('Error', `${err}\nError intializing tasks history JSON file.`);
       });
     } else {
       console.log('Task history exists');
-      console.log(JSON.parse(data_handler.readSync(task_history_path)))
+      console.log(JSON.parse(data_handler.readSync(task_history_path)));
       MainWindow.webContents.send('add-task-to-list', JSON.parse(data_handler.readSync(task_history_path)));
     }
   });
-  
 });
 
 // Create input window to get new task info
@@ -65,7 +63,7 @@ ipcMain.on('create-task', (event, data) => {
   InputWindow.close();
 
   const current_task_history = JSON.parse(data_handler.readSync(task_history_path));
-  current_task_history['tasks'].push({
+  current_task_history.tasks.push({
     name: data,
     completions: 0
   });
@@ -74,7 +72,7 @@ ipcMain.on('create-task', (event, data) => {
   console.log(current_task_history.tasks.length);
 
   // Create the task and approriate index in history to listeners
-  MainWindow.webContents.send('add-task-to-list', {tasks:[{name:data,completions:0}], current_task_index:current_task_history.tasks.length-1});
+  MainWindow.webContents.send('add-task-to-list', { tasks: [{ name: data, completions: 0 }], current_task_index: current_task_history.tasks.length - 1 });
 
   data_handler.create(task_history_path, JSON.stringify(current_task_history), (err) => {
     if (err) dialog.showErrorBox('Error', `${err}\nError updating task history.`);
@@ -108,7 +106,7 @@ ipcMain.on('remove-task', (event, data) => {
 // Increment a task's completions count
 ipcMain.on('complete-task', (event, data) => {
   const task_history = JSON.parse(data_handler.readSync(task_history_path));
-  task_history['tasks'][data]['completions']++;
+  task_history.tasks[data].completions++;
   data_handler.create(task_history_path, JSON.stringify(task_history), (err) => {
     if (err) dialog.showErrorBox('Error', `${err}\nFailed to increment task completion count.`);
   });

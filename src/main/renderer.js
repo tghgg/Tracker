@@ -1,7 +1,7 @@
 const { ipcRenderer } = require('electron');
 
 // Create a task containing details and a tracker
-function createTask(data) {
+function createTask (data) {
   console.log(data);
   console.log('data');
 
