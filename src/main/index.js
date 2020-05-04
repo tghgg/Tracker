@@ -10,6 +10,7 @@ let MainWindow, InputWindow;
 
 // Initialize app
 app.on('ready', () => {
+  console.log('Initialize app');
   MainWindow = new BrowserWindow(
     {
       width: 800,
@@ -24,6 +25,7 @@ app.on('ready', () => {
   MainWindow.loadFile('./src/main/index.html');
 
   MainWindow.on('ready-to-show', () => {
+    console.log('Show main window');
     MainWindow.show();
     // MainWindow.webContents.openDevTools();
 
@@ -44,6 +46,7 @@ app.on('ready', () => {
 
 // Create input window to get new task info
 ipcMain.on('add-task', (event, data) => {
+  console.log('Show window for task information input');
   InputWindow = new BrowserWindow({
     width: 300,
     height: 200,
@@ -60,6 +63,7 @@ ipcMain.on('add-task', (event, data) => {
 
 // Actually create the task, and add the task to task history
 ipcMain.on('create-task', (event, data) => {
+  console.log('Add the task to task history and create the task');
   InputWindow.close();
 
   const current_task_history = JSON.parse(data_handler.readSync(task_history_path));
@@ -67,9 +71,6 @@ ipcMain.on('create-task', (event, data) => {
     name: data,
     completions: 0
   });
-  console.log(current_task_history.tasks);
-
-  console.log(current_task_history.tasks.length);
 
   // Create the task and approriate index in history to listeners
   MainWindow.webContents.send('add-task-to-list', { tasks: [{ name: data, completions: 0 }], current_task_index: current_task_history.tasks.length - 1 });
@@ -89,6 +90,7 @@ ipcMain.on('remove-task', (event, data) => {
     message: 'Remove task?'
   }).then((result) => {
     if (result.response === 1) {
+      console.log('Remove a task');
       // Delete from history
       const task_history = JSON.parse(data_handler.readSync(task_history_path));
       task_history.tasks.splice(data, 1);
@@ -105,6 +107,7 @@ ipcMain.on('remove-task', (event, data) => {
 
 // Increment a task's completions count
 ipcMain.on('complete-task', (event, data) => {
+  console.log('Complete a task');
   const task_history = JSON.parse(data_handler.readSync(task_history_path));
   task_history.tasks[data].completions++;
   data_handler.create(task_history_path, JSON.stringify(task_history), (err) => {
