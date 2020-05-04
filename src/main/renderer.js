@@ -2,9 +2,6 @@ const { ipcRenderer } = require('electron');
 
 // Create a task containing details and a tracker
 function createTask (data) {
-  console.log(data);
-  console.log('data');
-
   for (let i = 0; i < data.tasks.length; i++) {
     const task = document.createElement('div');
     task.className = 'task';
@@ -13,7 +10,7 @@ function createTask (data) {
     button.innerHTML = data.tasks[i].name;
     button.className = 'task-button';
 
-    // Increment tracker on left click; ask to remove task on right click
+    // Increment tracker on left click; ask to remove task on right click; play sound effect
     button.addEventListener('click', (event) => {
       event.preventDefault();
       const task_tracker = event.currentTarget.parentElement.children[1];
@@ -22,6 +19,7 @@ function createTask (data) {
       task_tracker.addEventListener('webkitAnimationEnd', (event) => {
         task_tracker.classList.remove('pop');
       });
+      document.querySelector('audio').play();
       if ('current_task_index' in data) ipcRenderer.send('complete-task', data.current_task_index);
       else ipcRenderer.send('complete-task', i);
     });

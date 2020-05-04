@@ -1,16 +1,81 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
 
-const { join } = require('path');
+const { join, extname } = require('path');
 
 const data_handler = require('../../lib/data.js');
 
 const task_history_path = join(app.getPath('userData'), 'tasks.json');
+
+const menu = [
+  {
+    label: 'File',
+    submenu: [{
+      label: 'New Task',
+      click: () => {
+        console.log('Show window for task information input');
+        InputWindow = new BrowserWindow({
+          width: 400,
+          height: 300,
+          backgroundColor: '#1d1d1d',
+          show: true,
+          webPreferences: { nodeIntegration: true },
+          enableRemoteModule: false,
+          parent: MainWindow,
+          autoHideMenuBar: true,
+          modal: true
+        });
+        InputWindow.loadFile('./src/subwindows/input_window.html');
+      }
+    }, {
+      type: 'separator'
+    }, {
+      label: 'Export Task History',
+      click: () => {
+        console.log('Export task history');
+        dialog.showMessageBoxSync(MainWindow, {
+          type: 'info',
+          message: 'Please choose where you want to save the exported task history',
+          buttons: ['OK']
+        });
+        dialog.showSaveDialog(MainWindow, {
+          title: 'Export Task History',
+        }).then((result) => {
+          console.log(result);
+          if (result.canceled) return;
+          if (extname(result.filePath) !== '.json') result.filePath += '.json';
+          data_handler.create(result.filePath, data_handler.readSync(task_history_path), (err) => {
+            if (err) dialog.showErrorBox('Error', `${err}\nFailed to export task history`);
+          });
+        });
+    }}]
+  },
+  {
+    label: 'About',
+    click: (menuItem, window, event) => {
+      dialog.showMessageBox(MainWindow, {
+        title: 'About',
+        type: 'info',
+        // icon: './assets/fsnowdin.png',
+        message: 'Task Tracker by Falling Snowdin.\nNode.js version: ' + process.versions.node + '; ' + 'Electron version: ' + process.versions.electron + '.\nFile bugs here: https://github.com/tghgg/Tracker',
+        buttons: ['Close']
+      });
+    }
+  },
+  {
+    label: 'Quit',
+    role: 'quit'
+  }
+];
 
 let MainWindow, InputWindow;
 
 // Initialize app
 app.on('ready', () => {
   console.log('Initialize app');
+  app.allowRendererProcessReuse = true;
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
+
   MainWindow = new BrowserWindow(
     {
       width: 800,
@@ -19,7 +84,6 @@ app.on('ready', () => {
       show: false,
       webPreferences: { nodeIntegration: true },
       enableRemoteModule: false,
-      autoHideMenuBar: true
     }
   );
   MainWindow.loadFile('./src/main/index.html');
@@ -48,8 +112,8 @@ app.on('ready', () => {
 ipcMain.on('add-task', (event, data) => {
   console.log('Show window for task information input');
   InputWindow = new BrowserWindow({
-    width: 300,
-    height: 200,
+    width: 400,
+    height: 300,
     backgroundColor: '#1d1d1d',
     show: true,
     webPreferences: { nodeIntegration: true },
