@@ -52,7 +52,27 @@ const menu = [
       // Replace current tasks with the imported task history
       label: 'Import Task History',
       click: () => {
-        dialog.showOpenDialog(mainWindow, {
+        const current_task_history = JSON.parse(data_handler.readSync(task_history_path));
+        console.log(current_task_history.tasks)
+        console.log(typeof(current_task_history.tasks))
+
+        if (current_task_history.tasks.length !== 0) {
+          console.log('Ask for overwrite confirmation');
+          const result = dialog.showMessageBoxSync(MainWindow, {
+            title: 'Confirmation',
+            type: 'question',
+            buttons: ['Cancel', 'Overwrite'],
+            defaultId: 0,
+            message: 'There are existing tasks. Overwrite them with imported tasks?'
+          });
+          if (result === 1) {
+            console.log('Import new tasks');
+            MainWindow.webContents.send('remove-all-tasks');
+          } else {
+            return;
+          }
+        }
+        dialog.showOpenDialog(MainWindow, {
           filters: [{
             name: 'Task History', extensions: ['history']
           }, {
@@ -61,23 +81,13 @@ const menu = [
           properties: ['openFile'],
         }).then((file_object) => {
           if (file_object.canceled) return;
-          // Ask for confirmation if there are existing tasks
-          const current_task_history = JSON.parse(data_handler.readSync(task_history_path));
-          if (current_task_history.tasks !== []) {
-            dialog.showMessageBox(MainWindow, {
-              title: 'Confirmation',
-              type: 'question',
-              buttons: ['Cancel', 'Overwrite'],
-              defaultId: 0,
-              message: 'There are existing tasks. Overwrite them with imported tasks?'
-            }).then((result) => {
-              if (result.response === 1) {
-                console.log('Import new tasks');
-                MainWindow.webContents.send('remove-all-tasks');
-                MainWindow.webContents.send('add-task-to-list', JSON.parse(data_handler.readSync(file_object.filePath)));
-              }
-            });
-          }
+          const new_task_history = JSON.parse(data_handler.readSync(file_object.filePaths[0]));
+          console.log('new')
+          console.log(new_task_history)
+          MainWindow.webContents.send('add-task-to-list', new_task_history);
+          data_handler.create(task_history_path, JSON.stringify(new_task_history), (err) => {
+            if (err) dialog.showErrorBox('Error', `${err}\nError importing new task history.`);
+          });
         });
       }
     }]
