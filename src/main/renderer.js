@@ -1,11 +1,20 @@
 const { ipcRenderer } = require('electron');
 
+// Add task button
+document.querySelector('#add_button').addEventListener('submit', (event) => {
+  event.preventDefault();
+  ipcRenderer.send('add-task');
+});
+
 // Create a task containing details and a tracker
-function createTask (data) {
+ipcRenderer.on('add-task-to-list', (event, data) => {
   for (let i = 0; i < data.tasks.length; i++) {
+    console.log('huhu');
+    console.log(data)
     const task = document.createElement('div');
     task.className = 'task';
-
+    task.id = data.tasks[i].id;
+    console.log(task);
     const button = document.createElement('button');
     button.innerHTML = data.tasks[i].name;
     button.className = 'task-button';
@@ -20,13 +29,12 @@ function createTask (data) {
         task_tracker.classList.remove('pop');
       });
       document.querySelector('audio').play();
-      if ('current_task_index' in data) ipcRenderer.send('complete-task', data.current_task_index);
-      else ipcRenderer.send('complete-task', i);
+      ipcRenderer.send('complete-task', task.id);
+      console.log(`Send ${task.id}`);
     });
     button.addEventListener('contextmenu', (event) => {
       event.preventDefault();
-      if ('current_task_index' in data) ipcRenderer.send('remove-task', data.current_task_index);
-      else ipcRenderer.send('remove-task', i);
+      ipcRenderer.send('remove-task', task.id);
     });
 
     const tracker = document.createElement('h3');
@@ -37,20 +45,8 @@ function createTask (data) {
     task.appendChild(tracker);
     document.querySelector('.main').appendChild(task);
   }
-}
-
-// Add task button
-document.querySelector('#add_button').addEventListener('submit', (event) => {
-  event.preventDefault();
-  ipcRenderer.send('add-task');
-});
-
-ipcRenderer.on('add-task-to-list', (event, data) => {
-  createTask(data);
 });
 
 ipcRenderer.on('remove-task-from-list', (event, data) => {
-  const tasks = document.querySelectorAll('.task');
-  if (tasks.length === 0) tasks[0].remove();
-  else tasks[data].remove();
+  document.querySelector(`#${data}`).remove();
 });
