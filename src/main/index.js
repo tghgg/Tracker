@@ -38,9 +38,8 @@ const menu = [
           buttons: ['OK']
         });
         dialog.showSaveDialog(MainWindow, {
-          title: 'Export Task History',
+          title: 'Export Task History'
         }).then((result) => {
-          console.log(result);
           if (result.canceled) return;
           if (extname(result.filePath) !== '.history') result.filePath += '.history';
           data_handler.create(result.filePath, data_handler.readSync(task_history_path), (err) => {
@@ -53,9 +52,6 @@ const menu = [
       label: 'Import Task History',
       click: () => {
         const current_task_history = JSON.parse(data_handler.readSync(task_history_path));
-        console.log(current_task_history.tasks)
-        console.log(typeof(current_task_history.tasks))
-
         if (current_task_history.tasks.length !== 0) {
           console.log('Ask for overwrite confirmation');
           const result = dialog.showMessageBoxSync(MainWindow, {
@@ -66,24 +62,23 @@ const menu = [
             message: 'There are existing tasks. Overwrite them with imported tasks?'
           });
           if (result === 1) {
-            console.log('Import new tasks');
+            console.log('Remove current tasks');
             MainWindow.webContents.send('remove-all-tasks');
           } else {
             return;
           }
         }
+        console.log('Import task history');
         dialog.showOpenDialog(MainWindow, {
           filters: [{
             name: 'Task History', extensions: ['history']
           }, {
             name: 'All Files', extensions: ['*']
           }],
-          properties: ['openFile'],
+          properties: ['openFile']
         }).then((file_object) => {
           if (file_object.canceled) return;
           const new_task_history = JSON.parse(data_handler.readSync(file_object.filePaths[0]));
-          console.log('new')
-          console.log(new_task_history)
           MainWindow.webContents.send('add-task-to-list', new_task_history);
           data_handler.create(task_history_path, JSON.stringify(new_task_history), (err) => {
             if (err) dialog.showErrorBox('Error', `${err}\nError importing new task history.`);
@@ -126,7 +121,7 @@ app.on('ready', () => {
       backgroundColor: '#1d1d1d',
       show: false,
       webPreferences: { nodeIntegration: true },
-      enableRemoteModule: false,
+      enableRemoteModule: false
     }
   );
   MainWindow.loadFile('./src/main/index.html');
@@ -145,7 +140,6 @@ app.on('ready', () => {
       });
     } else {
       console.log('Task history exists');
-      console.log(JSON.parse(data_handler.readSync(task_history_path)));
       MainWindow.webContents.send('add-task-to-list', JSON.parse(data_handler.readSync(task_history_path)));
     }
   });
@@ -196,8 +190,6 @@ ipcMain.on('create-task', (event, data) => {
 
 // Remove task from task history
 ipcMain.on('remove-task', (event, data) => {
-  console.log(data);
-  console.log('lmao')
   dialog.showMessageBox(MainWindow, {
     title: 'Confirmation',
     type: 'question',
@@ -206,7 +198,7 @@ ipcMain.on('remove-task', (event, data) => {
     message: 'Remove task?'
   }).then((result) => {
     if (result.response === 1) {
-      console.log('Remove a task');
+      console.log('Remove task');
       // Delete from history
       const task_history = JSON.parse(data_handler.readSync(task_history_path));
 
@@ -230,12 +222,12 @@ ipcMain.on('remove-task', (event, data) => {
 
 // Increment a task's completions count
 ipcMain.on('complete-task', (event, data) => {
-  console.log('Complete a task');
+  console.log('Complete task');
   const task_history = JSON.parse(data_handler.readSync(task_history_path));
 
   for (let index = 0; index < task_history.tasks.length; index++) {
     if (task_history.tasks[index].id === data) {
-      console.log("yolo")
+      console.log('yolo');
       task_history.tasks[index].completions++;
       break;
     }
