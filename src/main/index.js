@@ -32,6 +32,10 @@ const menu = [
       label: 'Export Task History',
       click: () => {
         console.log('Export task history');
+        if (JSON.parse(data_handler.readSync(task_history_path)).tasks.length === 0) {
+          dialog.showErrorBox('No Tasks', "There's nothing to export.");
+          return;
+        }
         dialog.showMessageBoxSync(MainWindow, {
           type: 'info',
           message: 'Please choose where you want to save the exported task history',
