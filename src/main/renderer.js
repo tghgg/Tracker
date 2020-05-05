@@ -16,7 +16,7 @@ ipcRenderer.on('add-task-to-list', (event, data) => {
     task.id = data.tasks[i].id;
     console.log(task);
     const button = document.createElement('button');
-    button.innerHTML = data.tasks[i].name;
+    button.innerHTML = data.tasks[i].name.replace(/-/g, ' ');
     button.className = 'task-button';
 
     // Increment tracker on left click; ask to remove task on right click; play sound effect
@@ -48,5 +48,13 @@ ipcRenderer.on('add-task-to-list', (event, data) => {
 });
 
 ipcRenderer.on('remove-task-from-list', (event, data) => {
+  console.log(data);
   document.querySelector(`#${data}`).remove();
+});
+
+ipcRenderer.on('remove-all-tasks', (event, data) => {
+  const current_tasks = document.querySelectorAll('.task');
+  for (let i = 0; i < current_tasks.length; i++) {
+    current_tasks[i].remove();
+  }
 });
