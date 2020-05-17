@@ -11,13 +11,15 @@ body {
 
 .task-button {
     width: 80%;
-    margin-left: -15%;
-    margin-right: auto;
     display: inline-block;
+    padding: 0;
+    margin: 0;
 }
 
 .task-tracker {
     display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
     font-size: 1rem;
     text-align: center;
 }
@@ -34,7 +36,7 @@ body {
     animation-name: slidein;
     animation-timing-function: ease-out;
     text-align: center;
-    display: block;
+    display: flex;
 }
   
 @keyframes slidein {
