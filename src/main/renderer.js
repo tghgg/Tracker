@@ -1,7 +1,7 @@
 const { ipcRenderer } = require('electron');
 
 class Task {
-  constructor(id, name, completions) {
+  constructor (id, name, completions) {
     this.id = id;
     this.name = name;
     this.completions = completions;
