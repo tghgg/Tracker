@@ -14,9 +14,13 @@ const menu = [
       click: () => {
         console.log('Show window for task information input');
         InputWindow = new BrowserWindow({
-          width: 400,
-          height: 300,
-          backgroundColor: '#1d1d1d',
+          width: 300,
+          height: 100,
+          resizable: false,
+          center: true,
+          useContentSize: true,
+          frame: false,
+          backgroundColor: '#0f0f0f',
           show: true,
           webPreferences: { nodeIntegration: true },
           enableRemoteModule: false,
@@ -97,7 +101,7 @@ const menu = [
       dialog.showMessageBox(MainWindow, {
         title: 'About',
         type: 'info',
-        // icon: './assets/fsnowdin.png',
+        icon: './assets/fsnowdin.png',
         message: 'Task Tracker by Falling Snowdin.\nNode.js version: ' + process.versions.node + '; ' + 'Electron version: ' + process.versions.electron + '.\nFile bugs here: https://github.com/tghgg/Tracker',
         buttons: ['Close']
       });
@@ -116,7 +120,7 @@ app.on('ready', () => {
   console.log('Initialize app');
   app.allowRendererProcessReuse = true;
 
-  // Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
+  Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
 
   MainWindow = new BrowserWindow(
     {
@@ -147,11 +151,6 @@ app.on('ready', () => {
       MainWindow.webContents.send('add-task-to-list', JSON.parse(data_handler.readSync(task_history_path)));
     }
   });
-
-
-
-
-
 });
 
 // Create input window to get new task info
