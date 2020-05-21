@@ -12,10 +12,7 @@
         <hr>
     </div>
     <div class="main">
-      <div id="list">
-        <h2 v-for="task in tasks">{{ task }}</h2>
-        <task v-for="task in tasks" v-bind:name="task" v-bind:id="task"></task>
-      </div>
+      <task v-for="task in tasks" v-bind:name="task.name" v-bind:id="task.id" v-bind:completions="task.completions"></task>
     </div>
     <div id="add_button">
       <hr>

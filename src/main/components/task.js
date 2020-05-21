@@ -6,6 +6,6 @@
 // });
 
 Vue.component('task', {
-    props: ['name', 'id'],
-    template: '<button :id="id">{{ name }}</button>'
+    props: ['name', 'id', 'completions'],
+    template: '<div class="task" :id="id"><button class="task-button" >{{ name }}</button><h3 class="task-tracker">{{ completions }}</h3></div>',
 });
