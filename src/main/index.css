@@ -36,6 +36,7 @@ body {
     animation-name: slidein;
     animation-timing-function: ease-out;
     text-align: center;
+    margin-bottom: 10px;
     display: flex;
 }
   
@@ -87,6 +88,7 @@ button {
 	padding:5px 7px;
 	text-decoration:none;
 }
+
 button:hover {
 	background-color:transparent;
 }

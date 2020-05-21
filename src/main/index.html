@@ -12,6 +12,7 @@
         <hr>
     </div>
     <div class="main">
+      <task v-for="task in tasks" v-bind:name="task.name" v-bind:id="task.id" v-bind:completions="task.completions"></task>
     </div>
     <div id="add_button">
       <hr>
@@ -21,5 +22,7 @@
     </div>
     <audio src="../../assets/task-complete.ogg"></audio>
   </body>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="./components/task.js"></script>
   <script src='./renderer.js'></script>
 </html>
