@@ -2,14 +2,19 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <title>Add New Task</title>
     <link rel="stylesheet" type="text/css" href="input_window.css"/>
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"> 
   </head>
   <body>
       <div class="main">
-          <form v-on:submit="createTask($event)">
-            <input type="text" autofocus required placeholder="New Task"></input>
+          <h1>Create new task here!</h1>
+          <form>
+            <label for="input">Wat ur task nibba</label>
+            <br>
+            <input type="text" autofocus required></input>
+            <br>
+            <button>Create Task</button>
           </form>
       </div>
   </body>

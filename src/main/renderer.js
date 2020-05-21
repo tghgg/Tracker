@@ -1,12 +1,5 @@
 const { ipcRenderer } = require('electron');
 
-let vue_test = new Vue({
-  el: '#vue-test',
-  data: {
-    message: 'vue test'
-  }
-});
-
 // Add task button
 document.querySelector('#add_button').addEventListener('submit', (event) => {
   console.log('Create new task');
@@ -64,4 +57,3 @@ ipcRenderer.on('remove-all-tasks', (event, data) => {
     current_tasks[i].remove();
   }
 });
-
