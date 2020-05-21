@@ -32,12 +32,7 @@ ipcRenderer.on('add-task-to-list', (event, data) => {
     const newTask = new Task(data.tasks[i].id, data.tasks[i].name.replace(/-/g, ' '), data.tasks[i].completions);
 
     TASKS_LIST.tasks.push(newTask);
-    // const task = document.createElement('div');
-    // task.className = 'task';
-    // task.id = data.tasks[i].id;
-    // const button = document.createElement('button');
-    // button.innerHTML = data.tasks[i].name.replace(/-/g, ' ');
-    // button.className = 'task-button';
+
 
     // // Increment tracker on left click; ask to remove task on right click; play sound effect
     // button.addEventListener('click', (event) => {
@@ -55,14 +50,6 @@ ipcRenderer.on('add-task-to-list', (event, data) => {
     //   event.preventDefault();
     //   ipcRenderer.send('remove-task', task.id);
     // });
-
-    // const tracker = document.createElement('h3');
-    // tracker.className = 'task-tracker';
-    // tracker.textContent = data.tasks[i].completions;
-
-    // task.appendChild(button);
-    // task.appendChild(tracker);
-    // document.querySelector('.main').appendChild(task);
   }
 });
 
