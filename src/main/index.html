@@ -8,13 +8,14 @@
   </head>
   <body>
     <div class="head">
-        <div id="vue-test">
-          {{ message }}
-        </div>
         <h2>Tasks</h2>
         <hr>
     </div>
     <div class="main">
+      <div id="list">
+        <h2 v-for="task in tasks">{{ task }}</h2>
+        <task v-for="task in tasks" v-bind:name="task" v-bind:id="task"></task>
+      </div>
     </div>
     <div id="add_button">
       <hr>
@@ -25,5 +26,6 @@
     <audio src="../../assets/task-complete.ogg"></audio>
   </body>
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="./components/task.js"></script>
   <script src='./renderer.js'></script>
 </html>

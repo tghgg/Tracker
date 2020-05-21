@@ -160,11 +160,10 @@ ipcMain.on('add-task', (event, data) => {
   InputWindow = new BrowserWindow({
     width: 300,
     height: 100,
-    center: true,
     resizable: false,
+    center: true,
     useContentSize: true,
     frame: false,
-
     backgroundColor: '#0f0f0f',
     show: true,
     webPreferences: { nodeIntegration: true },

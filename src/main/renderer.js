@@ -1,9 +1,13 @@
 const { ipcRenderer } = require('electron');
 
-let vue_test = new Vue({
-  el: '#vue-test',
+const TASKS = new Vue({
+  el: '#list',
   data: {
-    message: 'vue test'
+    tasks: [
+      'Helu',
+      "helo",
+      'Hele'
+    ]
   }
 });
 
@@ -11,7 +15,8 @@ let vue_test = new Vue({
 document.querySelector('#add_button').addEventListener('submit', (event) => {
   console.log('Create new task');
   event.preventDefault();
-  ipcRenderer.send('add-task');
+  // ipcRenderer.send('add-task');
+  TASKS.$children.push()
 });
 
 // Create a task containing details and a tracker
@@ -64,4 +69,3 @@ ipcRenderer.on('remove-all-tasks', (event, data) => {
     current_tasks[i].remove();
   }
 });
-
