@@ -116,7 +116,7 @@ app.on('ready', () => {
   console.log('Initialize app');
   app.allowRendererProcessReuse = true;
 
-  Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
+  // Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
 
   MainWindow = new BrowserWindow(
     {
@@ -147,15 +147,25 @@ app.on('ready', () => {
       MainWindow.webContents.send('add-task-to-list', JSON.parse(data_handler.readSync(task_history_path)));
     }
   });
+
+
+
+
+
 });
 
 // Create input window to get new task info
 ipcMain.on('add-task', (event, data) => {
   console.log('Show window for task information input');
   InputWindow = new BrowserWindow({
-    width: 400,
-    height: 300,
-    backgroundColor: '#1d1d1d',
+    width: 300,
+    height: 100,
+    center: true,
+    resizable: false,
+    useContentSize: true,
+    frame: false,
+
+    backgroundColor: '#0f0f0f',
     show: true,
     webPreferences: { nodeIntegration: true },
     enableRemoteModule: false,
