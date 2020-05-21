@@ -11,9 +11,7 @@ class Task {
 const TASKS_LIST = new Vue({
   el: '.main',
   data: {
-    tasks: [
-      new Task(1, "Vue Test", 0),
-    ]
+    tasks: []
   }
 });
 
@@ -28,28 +26,8 @@ document.querySelector('#add_button').addEventListener('submit', (event) => {
 ipcRenderer.on('add-task-to-list', (event, data) => {
   console.log('Add task(s) to current task list');
   for (let i = 0; i < data.tasks.length; i++) {
-
     const newTask = new Task(data.tasks[i].id, data.tasks[i].name.replace(/-/g, ' '), data.tasks[i].completions);
-
     TASKS_LIST.tasks.push(newTask);
-
-
-    // // Increment tracker on left click; ask to remove task on right click; play sound effect
-    // button.addEventListener('click', (event) => {
-    //   event.preventDefault();
-    //   const task_tracker = event.currentTarget.parentElement.children[1];
-    //   task_tracker.innerHTML++;
-    //   task_tracker.classList.add('pop');
-    //   task_tracker.addEventListener('webkitAnimationEnd', (event) => {
-    //     task_tracker.classList.remove('pop');
-    //   });
-    //   document.querySelector('audio').play();
-    //   ipcRenderer.send('complete-task', task.id);
-    // });
-    // button.addEventListener('contextmenu', (event) => {
-    //   event.preventDefault();
-    //   ipcRenderer.send('remove-task', task.id);
-    // });
   }
 });
 
