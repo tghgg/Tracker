@@ -124,3 +124,14 @@ button:active {
 	position:relative;
 	top:1px;
 }
+
+::-webkit-scrollbar {
+    background: #1d1d1d;
+}
+
+::-webkit-scrollbar-thumb {
+    background: white;
+    width: 3px;
+}
+
+
