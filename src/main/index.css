@@ -9,26 +9,8 @@ body {
     display: block;
 }
 
-.task-button {
-    width: 80%;
-    display: inline-block;
-    padding: 0;
-    margin: 0;
-}
-
-.task-tracker {
-    display: inline-block;
-    margin-left: auto;
-    margin-right: auto;
-    font-size: 1rem;
-    text-align: center;
-}
-
-.task-tracker.pop {
-    animation-duration: 0.2s;
-    animation-name: pop;
-    animation-direction: alternate;
-    animation-timing-function: ease-in;
+.main {
+    display: block;
 }
 
 .task {
@@ -38,7 +20,39 @@ body {
     text-align: center;
     margin-bottom: 10px;
     display: flex;
+    z-index: 0;
 }
+
+.task-button {
+    width: 80%;
+    display: block;
+    padding: 0;
+    margin: 0;
+}
+
+.task-button:focus {
+    outline: none;
+}
+
+.task-tracker {
+    display: block;
+    width: 20%;
+    margin-left: auto;
+    margin-right: auto;
+    border:1px solid #525252;
+    font-size: 1rem;
+    text-align: center;
+    background-color: #0f0f0f;
+}
+
+.task-tracker.pop {
+    animation-duration: 0.2s;
+    animation-name: pop;
+    animation-direction: alternate;
+    animation-timing-function: ease-in;
+}
+
+
   
 @keyframes slidein {
     from {
@@ -75,6 +89,7 @@ body {
     width: 100%;
     margin-left: auto;
     margin-right: auto;
+    z-index: 100;
 }
 
 button {

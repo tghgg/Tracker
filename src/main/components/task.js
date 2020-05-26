@@ -8,12 +8,14 @@ Vue.component('task', {
   data: function () {
     return { taskCompleted: this.completed };
   },
-  template: '<div class="task" :id="id"><button class="task-button" v-on:contextmenu="removeTask($event)" v-on:click="completeTask">{{ name }}</button><h3 class="task-tracker" v-if="taskCompleted">Done</h3><h3 class="task-tracker" v-else>X</h3></div>',
+  template: '<div class="task" :id="id"><button class="task-button" v-on:contextmenu="removeTask($event)" v-on:click="completeTask">{{ name }}</button><div class="task-tracker"><h3 v-if="taskCompleted">Done</h3><h3 v-else>X</h3></div></div>',
   methods: {
     completeTask: function () {
       this.taskCompleted = true;
       ipcRenderer.send('complete-task', this.id);
       // document.getElementsByTagName('audio').play();
+      document.querySelector(`#${this.id} > .task-tracker`).style['background-color'] = 'rgb(55, 207, 93)';
+      document.querySelector(`#${this.id} > .task-tracker`).style['border-color'] = 'rgb(55, 207, 93)';
       setTimeout(() => document.getElementById(this.id).remove(), 500 );
       
     },

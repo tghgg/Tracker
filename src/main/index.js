@@ -137,7 +137,7 @@ app.on('ready', () => {
   MainWindow.on('ready-to-show', () => {
     console.log('Show main window');
     MainWindow.show();
-    // MainWindow.webContents.openDevTools();
+    MainWindow.webContents.openDevTools();
 
     if (!data_handler.existsSync(task_history_path)) {
       console.log('Initialize task history');
@@ -158,7 +158,7 @@ ipcMain.on('add-task', (event, data) => {
   console.log('Show window for task information input');
   InputWindow = new BrowserWindow({
     width: 300,
-    height: 100,
+    height: 80,
     resizable: false,
     center: true,
     useContentSize: true,
