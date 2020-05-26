@@ -43,3 +43,10 @@ ipcRenderer.on('remove-all-tasks', (event, data) => {
     current_tasks[i].remove();
   }
 });
+
+// Resize the page body
+ipcRenderer.on('resize', (event, data) => {
+  console.log('Resize to ' + data);
+  document.querySelector('body').style.height = data;
+
+})

@@ -151,6 +151,13 @@ app.on('ready', () => {
       MainWindow.webContents.send('add-task-to-list', JSON.parse(data_handler.readSync(task_history_path)));
     }
   });
+ 
+  // Resize the webpage automatically to ensure the task lists look correct
+  MainWindow.on('resize', () => {
+    MainWindow.webContents.send('resize', MainWindow.getContentSize());
+  })
+
+
 });
 
 // Create input window to get new task info

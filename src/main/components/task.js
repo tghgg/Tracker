@@ -14,6 +14,7 @@ Vue.component('task', {
       this.taskCompleted = true;
       ipcRenderer.send('complete-task', this.id);
       // document.getElementsByTagName('audio').play();
+      document.querySelector(`#${this.id} > button`).disabled = true;
       document.querySelector(`#${this.id} > .task-tracker`).style['background-color'] = 'rgb(55, 207, 93)';
       document.querySelector(`#${this.id} > .task-tracker`).style['border-color'] = 'rgb(55, 207, 93)';
       setTimeout(() => document.getElementById(this.id).remove(), 500 );
