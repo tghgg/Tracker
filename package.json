@@ -1,7 +1,7 @@
 {
-  "name": "tracker",
-  "version": "0.2.1",
-  "description": "Simple habit tracker",
+  "name": "tudu",
+  "version": "1.0.0",
+  "description": "TuDu List",
   "main": "./src/main/index.js",
   "scripts": {
     "start": "electron .",
@@ -11,15 +11,15 @@
     "pack_linux": "electron-builder -l"
   },
   "build": {
-    "appId": "me.tasktracker.Tracker",
-    "productName": "Task Tracker",
+    "appId": "me.tasktracker.TuDu",
+    "productName": "TuDu",
     "linux": {
       "target": [
         "AppImage",
         "deb"
       ],
       "category": "Office",
-      "executableName": "Task Tracker"
+      "executableName": "TuDu"
     },
     "win": {
       "target": "NSIS"
