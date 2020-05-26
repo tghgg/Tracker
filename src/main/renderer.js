@@ -1,10 +1,10 @@
 const { ipcRenderer } = require('electron');
 
 class Task {
-  constructor (id, name, completions) {
+  constructor (id, name, completed) {
     this.id = id;
     this.name = name;
-    this.completions = completions;
+    this.completed = completed;
   }
 }
 
@@ -26,7 +26,7 @@ document.querySelector('#add_button').addEventListener('submit', (event) => {
 ipcRenderer.on('add-task-to-list', (event, data) => {
   console.log('Add task(s) to current task list');
   for (let i = 0; i < data.tasks.length; i++) {
-    const newTask = new Task(data.tasks[i].id, data.tasks[i].name.replace(/-/g, ' '), data.tasks[i].completions);
+    const newTask = new Task(data.tasks[i].id, data.tasks[i].name.replace(/-/g, ' '), data.tasks[i].completed);
     TASKS_LIST.tasks.push(newTask);
   }
 });

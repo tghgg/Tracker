@@ -187,7 +187,7 @@ ipcMain.on('create-task', (event, data) => {
   const new_task = {
     name: data,
     id: `task_${data}_${current_time.getFullYear()}${current_time.getMonth()}${current_time.getDate()}`,
-    completions: 0
+    completed: false
   };
   current_task_history.tasks.push(new_task);
 
@@ -232,15 +232,16 @@ ipcMain.on('remove-task', (event, data) => {
   });
 });
 
-// Increment a task's completions count
+// Complete a task and remove it from history
 ipcMain.on('complete-task', (event, data) => {
   console.log('Complete task');
   const task_history = JSON.parse(data_handler.readSync(task_history_path));
 
   for (let index = 0; index < task_history.tasks.length; index++) {
     if (task_history.tasks[index].id === data) {
-      console.log('yolo');
-      task_history.tasks[index].completions++;
+      console.log('Complete ' + task_history.tasks[index].id);
+      // Thank god for simple array operations in higher-level languages
+      task_history.tasks.splice(index, 1);
       break;
     }
   }
