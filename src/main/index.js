@@ -102,7 +102,7 @@ const menu = [
         title: 'About',
         type: 'info',
         icon: './assets/fsnowdin.png',
-        message: 'Task Tracker by Falling Snowdin.\nNode.js version: ' + process.versions.node + '; ' + 'Electron version: ' + process.versions.electron + '.\nFile bugs here: https://github.com/tghgg/Tracker',
+        message: 'TuDu by Falling Snowdin.\nNode.js version: ' + process.versions.node + '; ' + 'Electron version: ' + process.versions.electron + '.\nFile bugs here: https://github.com/tghgg/Tracker',
         buttons: ['Close']
       });
     }
@@ -151,13 +151,11 @@ app.on('ready', () => {
       MainWindow.webContents.send('add-task-to-list', JSON.parse(data_handler.readSync(task_history_path)));
     }
   });
- 
+
   // Resize the webpage automatically to ensure the task lists look correct
   MainWindow.on('resize', () => {
     MainWindow.webContents.send('resize', MainWindow.getContentSize());
-  })
-
-
+  });
 });
 
 // Create input window to get new task info

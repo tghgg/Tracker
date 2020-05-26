@@ -48,5 +48,4 @@ ipcRenderer.on('remove-all-tasks', (event, data) => {
 ipcRenderer.on('resize', (event, data) => {
   console.log('Resize to ' + data);
   document.querySelector('body').style.height = data;
-
-})
+});

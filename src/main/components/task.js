@@ -17,8 +17,7 @@ Vue.component('task', {
       document.querySelector(`#${this.id} > button`).disabled = true;
       document.querySelector(`#${this.id} > .task-tracker`).style['background-color'] = 'rgb(55, 207, 93)';
       document.querySelector(`#${this.id} > .task-tracker`).style['border-color'] = 'rgb(55, 207, 93)';
-      setTimeout(() => document.getElementById(this.id).remove(), 500 );
-      
+      setTimeout(() => document.getElementById(this.id).remove(), 500);
     },
     removeTask: function (event) {
       event.preventDefault();
