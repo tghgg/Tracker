@@ -25,7 +25,10 @@
       "target": "NSIS"
     }
   },
-  "author": "Falling Snowdin",
+  "author": {
+    "email": "falling_snowdin@protonmail.com",
+    "name": "Falling Snowdin"
+  },
   "license": "MIT",
   "devDependencies": {
     "electron": "^8.3.0",

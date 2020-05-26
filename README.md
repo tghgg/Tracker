@@ -1,4 +1,4 @@
 ![WATASHI-GA-KITA](./assets/screenshot.png)
 
-# Tracker
-A simple habit tracker. Nothing fancy. WIP.
+# TuDu
+A simple TuDu list. Might get more fancy as time goes on.
