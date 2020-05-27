@@ -137,13 +137,11 @@ app.on('ready', () => {
   MainWindow.on('ready-to-show', () => {
     console.log('Show main window');
     MainWindow.show();
-    // MainWindow.webContents.openDevTools();
+    MainWindow.webContents.openDevTools();
 
     if (!data_handler.existsSync(task_history_path)) {
       console.log('Initialize task history');
-      data_handler.create(task_history_path, JSON.stringify({
-        tasks: []
-      }), (err) => {
+      data_handler.create(task_history_path, JSON.stringify({}), (err) => {
         if (err) dialog.showErrorBox('Error', `${err}\nError intializing tasks history JSON file.`);
       });
     } else {
@@ -188,17 +186,19 @@ ipcMain.on('create-task', (event, data) => {
 
   const current_task_history = JSON.parse(data_handler.readSync(task_history_path));
   const current_time = new Date();
+  const id = `task_${data}_${current_time.getFullYear()}${current_time.getMonth()}${current_time.getDate()}`;
   // ID starts with 'task_' since HTML does not allow ID to start with a digit
   const new_task = {
     name: data,
-    id: `task_${data}_${current_time.getFullYear()}${current_time.getMonth()}${current_time.getDate()}`,
+    id: id,
     completed: false
   };
-  current_task_history.tasks.push(new_task);
+  current_task_history[id] = new_task;
 
-  // Create the task and approriate index in history to listeners
-  // We send an object with a 'tasks' key so we can re-use the add-task-to-list when the app re-create existing tasks on start
-  MainWindow.webContents.send('add-task-to-list', { tasks: [new_task] });
+  // Send the task(s) and their info to the renderer
+  const temp_task = {};
+  temp_task[id] = new_task;
+  MainWindow.webContents.send('add-task-to-list', temp_task);
 
   data_handler.create(task_history_path, JSON.stringify(current_task_history), (err) => {
     if (err) dialog.showErrorBox('Error', `${err}\nError updating task history.`);
@@ -218,18 +218,11 @@ ipcMain.on('remove-task', (event, data) => {
       console.log('Remove task');
       // Delete from history
       const task_history = JSON.parse(data_handler.readSync(task_history_path));
-
-      for (let index = 0; index < task_history.tasks.length; index++) {
-        if (task_history.tasks[index].id === data) {
-          task_history.tasks.splice(index, 1);
-          break;
-        }
-      }
-
+      delete task_history[data];
       data_handler.create(task_history_path, JSON.stringify(task_history), (err) => {
         if (err) dialog.showErrorBox('Error', `${err}\nFailed to remove task from task history.`);
       });
-      // Remove from renderer
+      // Remove from the renderer
       MainWindow.webContents.send('remove-task-from-list', data);
     }
   }, (err) => {
@@ -241,16 +234,7 @@ ipcMain.on('remove-task', (event, data) => {
 ipcMain.on('complete-task', (event, data) => {
   console.log('Complete task');
   const task_history = JSON.parse(data_handler.readSync(task_history_path));
-
-  for (let index = 0; index < task_history.tasks.length; index++) {
-    if (task_history.tasks[index].id === data) {
-      console.log('Complete ' + task_history.tasks[index].id);
-      // Thank god for simple array operations in higher-level languages
-      task_history.tasks.splice(index, 1);
-      break;
-    }
-  }
-
+  delete task_history[data];
   data_handler.create(task_history_path, JSON.stringify(task_history), (err) => {
     if (err) dialog.showErrorBox('Error', `${err}\nFailed to increment task completion count.`);
   });
