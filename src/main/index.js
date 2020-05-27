@@ -50,7 +50,7 @@ const menu = [
           title: 'Export Task History'
         }).then((result) => {
           if (result.canceled) return;
-          if (extname(result.filePath) !== '.history') result.filePath += '.history';
+          if (extname(result.filePath) !== '.json') result.filePath += '.json';
           DataHandler.create(result.filePath, DataHandler.readSync(TaskHistoryPath), (err) => {
             if (err) dialog.showErrorBox('Error', `${err}\nFailed to export task history`);
           });
@@ -74,7 +74,7 @@ const menu = [
         console.log('Import task history');
         dialog.showOpenDialog(MainWindow, {
           filters: [{
-            name: 'Task History', extensions: ['history']
+            name: 'Task History', extensions: ['json']
           }, {
             name: 'All Files', extensions: ['*']
           }],
