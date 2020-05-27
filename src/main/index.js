@@ -5,7 +5,7 @@ const { join, extname } = require('path');
 
 const DataHandler = require('../../lib/data.js');
 
-const TaskHistoryPath = join(app.getPath('userData'), 'tasks.history');
+const TaskHistoryPath = join(app.getPath('userData'), 'tudu-tasks-history.json');
 
 const menu = [
   {
@@ -13,7 +13,7 @@ const menu = [
     submenu: [{
       label: 'New Task',
       click: () => {
-        console.log('Show window for task information input');
+        console.log('Show task creation window');
         InputWindow = new BrowserWindow({
           width: 300,
           height: 80,
@@ -37,7 +37,7 @@ const menu = [
       label: 'Export Task History',
       click: () => {
         console.log('Export task history');
-        if (JSON.parse(DataHandler.readSync(TaskHistoryPath)).tasks.length === 0) {
+        if (Object.keys(JSON.parse(DataHandler.readSync(TaskHistoryPath))).length === 0) {
           dialog.showErrorBox('No Tasks', "There's nothing to export.");
           return;
         }
@@ -60,8 +60,7 @@ const menu = [
       // Replace current tasks with the imported task history
       label: 'Import Task History',
       click: () => {
-        const currentTaskHistory = JSON.parse(DataHandler.readSync(TaskHistoryPath));
-        if (currentTaskHistory.tasks.length !== 0) {
+        if (Object.keys(JSON.parse(DataHandler.readSync(TaskHistoryPath))).length !== 0) {
           console.log('Ask for overwrite confirmation');
           const result = dialog.showMessageBoxSync(MainWindow, {
             title: 'Confirmation',
@@ -70,12 +69,7 @@ const menu = [
             defaultId: 0,
             message: 'There are existing tasks. Overwrite them with imported tasks?'
           });
-          if (result === 1) {
-            console.log('Remove current tasks');
-            MainWindow.webContents.send('remove-all-tasks');
-          } else {
-            return;
-          }
+          if (result !== 1) return;
         }
         console.log('Import task history');
         dialog.showOpenDialog(MainWindow, {
@@ -87,6 +81,9 @@ const menu = [
           properties: ['openFile']
         }).then((fileObject) => {
           if (fileObject.canceled) return;
+
+          MainWindow.webContents.send('remove-all-tasks');
+
           const newTaskHistory = JSON.parse(DataHandler.readSync(fileObject.filePaths[0]));
           MainWindow.webContents.send('add-task-to-list', newTaskHistory);
           DataHandler.create(TaskHistoryPath, JSON.stringify(newTaskHistory), (err) => {
@@ -138,7 +135,7 @@ app.on('ready', () => {
   MainWindow.on('ready-to-show', () => {
     console.log('Show main window');
     MainWindow.show();
-    MainWindow.webContents.openDevTools();
+    // MainWindow.webContents.openDevTools();
 
     if (!DataHandler.existsSync(TaskHistoryPath)) {
       console.log('Initialize task history');
