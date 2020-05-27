@@ -1,3 +1,4 @@
+'use strict';
 const { ipcRenderer } = require('electron');
 
 class Task {
@@ -39,9 +40,9 @@ ipcRenderer.on('remove-task-from-list', (event, data) => {
 
 ipcRenderer.on('remove-all-tasks', (event, data) => {
   console.log('Remove all tasks');
-  const current_tasks = document.querySelectorAll('.task');
-  for (let i = 0; i < current_tasks.length; i++) {
-    current_tasks[i].remove();
+  const currentTasks = document.querySelectorAll('.task');
+  for (let i = 0; i < currentTasks.length; i++) {
+    currentTasks[i].remove();
   }
 });
 

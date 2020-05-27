@@ -1,5 +1,6 @@
 // Template task Vue component
 
+'use strict';
 // Props are for the initial values only
 // If you want to change it, copy the props value to a data object, and mutate the data object's keys
 Vue.component('task', {
@@ -21,8 +22,7 @@ Vue.component('task', {
     },
     removeTask: function (event) {
       event.preventDefault();
-      console.log(this.id);
-      ipcRenderer.send('remove-task', this.id);
+      ipcRenderer.send('remove-task', { id: this.id, name: this.name });
     }
   }
 });

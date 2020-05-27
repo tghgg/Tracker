@@ -1,10 +1,11 @@
+'use strict';
 const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
 
 const { join, extname } = require('path');
 
-const data_handler = require('../../lib/data.js');
+const DataHandler = require('../../lib/data.js');
 
-const task_history_path = join(app.getPath('userData'), 'tasks.history');
+const TaskHistoryPath = join(app.getPath('userData'), 'tasks.history');
 
 const menu = [
   {
@@ -36,7 +37,7 @@ const menu = [
       label: 'Export Task History',
       click: () => {
         console.log('Export task history');
-        if (JSON.parse(data_handler.readSync(task_history_path)).tasks.length === 0) {
+        if (JSON.parse(DataHandler.readSync(TaskHistoryPath)).tasks.length === 0) {
           dialog.showErrorBox('No Tasks', "There's nothing to export.");
           return;
         }
@@ -50,7 +51,7 @@ const menu = [
         }).then((result) => {
           if (result.canceled) return;
           if (extname(result.filePath) !== '.history') result.filePath += '.history';
-          data_handler.create(result.filePath, data_handler.readSync(task_history_path), (err) => {
+          DataHandler.create(result.filePath, DataHandler.readSync(TaskHistoryPath), (err) => {
             if (err) dialog.showErrorBox('Error', `${err}\nFailed to export task history`);
           });
         });
@@ -59,8 +60,8 @@ const menu = [
       // Replace current tasks with the imported task history
       label: 'Import Task History',
       click: () => {
-        const current_task_history = JSON.parse(data_handler.readSync(task_history_path));
-        if (current_task_history.tasks.length !== 0) {
+        const currentTaskHistory = JSON.parse(DataHandler.readSync(TaskHistoryPath));
+        if (currentTaskHistory.tasks.length !== 0) {
           console.log('Ask for overwrite confirmation');
           const result = dialog.showMessageBoxSync(MainWindow, {
             title: 'Confirmation',
@@ -84,11 +85,11 @@ const menu = [
             name: 'All Files', extensions: ['*']
           }],
           properties: ['openFile']
-        }).then((file_object) => {
-          if (file_object.canceled) return;
-          const new_task_history = JSON.parse(data_handler.readSync(file_object.filePaths[0]));
-          MainWindow.webContents.send('add-task-to-list', new_task_history);
-          data_handler.create(task_history_path, JSON.stringify(new_task_history), (err) => {
+        }).then((fileObject) => {
+          if (fileObject.canceled) return;
+          const newTaskHistory = JSON.parse(DataHandler.readSync(fileObject.filePaths[0]));
+          MainWindow.webContents.send('add-task-to-list', newTaskHistory);
+          DataHandler.create(TaskHistoryPath, JSON.stringify(newTaskHistory), (err) => {
             if (err) dialog.showErrorBox('Error', `${err}\nError importing new task history.`);
           });
         });
@@ -139,14 +140,14 @@ app.on('ready', () => {
     MainWindow.show();
     MainWindow.webContents.openDevTools();
 
-    if (!data_handler.existsSync(task_history_path)) {
+    if (!DataHandler.existsSync(TaskHistoryPath)) {
       console.log('Initialize task history');
-      data_handler.create(task_history_path, JSON.stringify({}), (err) => {
+      DataHandler.create(TaskHistoryPath, JSON.stringify({}), (err) => {
         if (err) dialog.showErrorBox('Error', `${err}\nError intializing tasks history JSON file.`);
       });
     } else {
       console.log('Task history exists');
-      MainWindow.webContents.send('add-task-to-list', JSON.parse(data_handler.readSync(task_history_path)));
+      MainWindow.webContents.send('add-task-to-list', JSON.parse(DataHandler.readSync(TaskHistoryPath)));
     }
   });
 
@@ -184,23 +185,23 @@ ipcMain.on('create-task', (event, data) => {
   data = data.trim();
   data = data.replace(/ /g, '-');
 
-  const current_task_history = JSON.parse(data_handler.readSync(task_history_path));
-  const current_time = new Date();
-  const id = `task_${data}_${current_time.getFullYear()}${current_time.getMonth()}${current_time.getDate()}`;
+  const currentTaskHistory = JSON.parse(DataHandler.readSync(TaskHistoryPath));
+  const currentTime = new Date();
+  const id = `task_${data}_${currentTime.getFullYear()}${currentTime.getMonth()}${currentTime.getDate()}`;
   // ID starts with 'task_' since HTML does not allow ID to start with a digit
-  const new_task = {
+  const newTask = {
     name: data,
     id: id,
     completed: false
   };
-  current_task_history[id] = new_task;
+  currentTaskHistory[id] = newTask;
 
   // Send the task(s) and their info to the renderer
-  const temp_task = {};
-  temp_task[id] = new_task;
-  MainWindow.webContents.send('add-task-to-list', temp_task);
+  const tempTask = {};
+  tempTask[id] = newTask;
+  MainWindow.webContents.send('add-task-to-list', tempTask);
 
-  data_handler.create(task_history_path, JSON.stringify(current_task_history), (err) => {
+  DataHandler.create(TaskHistoryPath, JSON.stringify(currentTaskHistory), (err) => {
     if (err) dialog.showErrorBox('Error', `${err}\nError updating task history.`);
   });
 });
@@ -212,18 +213,18 @@ ipcMain.on('remove-task', (event, data) => {
     type: 'question',
     buttons: ['Cancel', 'Remove'],
     defaultId: 0,
-    message: 'Remove task?'
+    message: `Remove ${data.name}?`
   }).then((result) => {
     if (result.response === 1) {
       console.log('Remove task');
       // Delete from history
-      const task_history = JSON.parse(data_handler.readSync(task_history_path));
-      delete task_history[data];
-      data_handler.create(task_history_path, JSON.stringify(task_history), (err) => {
+      const taskHistory = JSON.parse(DataHandler.readSync(TaskHistoryPath));
+      delete taskHistory[data.id];
+      DataHandler.create(TaskHistoryPath, JSON.stringify(taskHistory), (err) => {
         if (err) dialog.showErrorBox('Error', `${err}\nFailed to remove task from task history.`);
       });
       // Remove from the renderer
-      MainWindow.webContents.send('remove-task-from-list', data);
+      MainWindow.webContents.send('remove-task-from-list', data.id);
     }
   }, (err) => {
     if (err) dialog.showErrorBox('Error', `${err}\nError removing task.`);
@@ -233,9 +234,9 @@ ipcMain.on('remove-task', (event, data) => {
 // Complete a task and remove it from history
 ipcMain.on('complete-task', (event, data) => {
   console.log('Complete task');
-  const task_history = JSON.parse(data_handler.readSync(task_history_path));
-  delete task_history[data];
-  data_handler.create(task_history_path, JSON.stringify(task_history), (err) => {
+  const taskHistory = JSON.parse(DataHandler.readSync(TaskHistoryPath));
+  delete taskHistory[data];
+  DataHandler.create(TaskHistoryPath, JSON.stringify(taskHistory), (err) => {
     if (err) dialog.showErrorBox('Error', `${err}\nFailed to increment task completion count.`);
   });
 });
