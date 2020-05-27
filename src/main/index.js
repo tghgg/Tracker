@@ -5,30 +5,44 @@ const { join, extname } = require('path');
 
 const DataHandler = require('../../lib/data.js');
 
-const TaskHistoryPath = join(app.getPath('userData'), 'tudu-tasks-history.json');
+const TASK_HISTORY_PATH = join(app.getPath('userData'), 'tudu-tasks-history.json');
 
-const menu = [
+let MainWindow, InputWindow;
+
+const MAIN_WINDOW_CONFIG = {
+  width: 800,
+  height: 600,
+  backgroundColor: '#1d1d1d',
+  show: false,
+  webPreferences: { nodeIntegration: true },
+  enableRemoteModule: false
+};
+
+const INPUT_WINDOW_CONFIG = {
+  width: 300,
+  height: 80,
+  resizable: false,
+  center: true,
+  useContentSize: true,
+  frame: false,
+  backgroundColor: '#0f0f0f',
+  show: true,
+  webPreferences: { nodeIntegration: true },
+  enableRemoteModule: false,
+  parent: MainWindow,
+  autoHideMenuBar: true,
+  modal: true
+};
+
+
+const MENU = [
   {
     label: 'File',
     submenu: [{
       label: 'New Task',
       click: () => {
         console.log('Show task creation window');
-        InputWindow = new BrowserWindow({
-          width: 300,
-          height: 80,
-          resizable: false,
-          center: true,
-          useContentSize: true,
-          frame: false,
-          backgroundColor: '#0f0f0f',
-          show: true,
-          webPreferences: { nodeIntegration: true },
-          enableRemoteModule: false,
-          parent: MainWindow,
-          autoHideMenuBar: true,
-          modal: true
-        });
+        InputWindow = new BrowserWindow(INPUT_WINDOW_CONFIG);
         InputWindow.loadFile('./src/subwindows/input_window.html');
       }
     }, {
@@ -37,7 +51,7 @@ const menu = [
       label: 'Export Task History',
       click: () => {
         console.log('Export task history');
-        if (Object.keys(JSON.parse(DataHandler.readSync(TaskHistoryPath))).length === 0) {
+        if (Object.keys(JSON.parse(DataHandler.readSync(TASK_HISTORY_PATH))).length === 0) {
           dialog.showErrorBox('No Tasks', "There's nothing to export.");
           return;
         }
@@ -51,7 +65,7 @@ const menu = [
         }).then((result) => {
           if (result.canceled) return;
           if (extname(result.filePath) !== '.json') result.filePath += '.json';
-          DataHandler.create(result.filePath, DataHandler.readSync(TaskHistoryPath), (err) => {
+          DataHandler.create(result.filePath, DataHandler.readSync(TASK_HISTORY_PATH), (err) => {
             if (err) dialog.showErrorBox('Error', `${err}\nFailed to export task history`);
           });
         });
@@ -60,7 +74,7 @@ const menu = [
       // Replace current tasks with the imported task history
       label: 'Import Task History',
       click: () => {
-        if (Object.keys(JSON.parse(DataHandler.readSync(TaskHistoryPath))).length !== 0) {
+        if (Object.keys(JSON.parse(DataHandler.readSync(TASK_HISTORY_PATH))).length !== 0) {
           console.log('Ask for overwrite confirmation');
           const result = dialog.showMessageBoxSync(MainWindow, {
             title: 'Confirmation',
@@ -86,7 +100,7 @@ const menu = [
 
           const newTaskHistory = JSON.parse(DataHandler.readSync(fileObject.filePaths[0]));
           MainWindow.webContents.send('add-task-to-list', newTaskHistory);
-          DataHandler.create(TaskHistoryPath, JSON.stringify(newTaskHistory), (err) => {
+          DataHandler.create(TASK_HISTORY_PATH, JSON.stringify(newTaskHistory), (err) => {
             if (err) dialog.showErrorBox('Error', `${err}\nError importing new task history.`);
           });
         });
@@ -111,25 +125,16 @@ const menu = [
   }
 ];
 
-let MainWindow, InputWindow;
+
 
 // Initialize app
 app.on('ready', () => {
   console.log('Initialize app');
   app.allowRendererProcessReuse = true;
 
-  Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
+  Menu.setApplicationMenu(Menu.buildFromTemplate(MENU));
 
-  MainWindow = new BrowserWindow(
-    {
-      width: 800,
-      height: 600,
-      backgroundColor: '#1d1d1d',
-      show: false,
-      webPreferences: { nodeIntegration: true },
-      enableRemoteModule: false
-    }
-  );
+  MainWindow = new BrowserWindow(MAIN_WINDOW_CONFIG);
   MainWindow.loadFile('./src/main/index.html');
 
   MainWindow.on('ready-to-show', () => {
@@ -137,14 +142,14 @@ app.on('ready', () => {
     MainWindow.show();
     // MainWindow.webContents.openDevTools();
 
-    if (!DataHandler.existsSync(TaskHistoryPath)) {
+    if (!DataHandler.existsSync(TASK_HISTORY_PATH)) {
       console.log('Initialize task history');
-      DataHandler.create(TaskHistoryPath, JSON.stringify({}), (err) => {
+      DataHandler.create(TASK_HISTORY_PATH, JSON.stringify({}), (err) => {
         if (err) dialog.showErrorBox('Error', `${err}\nError intializing tasks history JSON file.`);
       });
     } else {
       console.log('Task history exists');
-      MainWindow.webContents.send('add-task-to-list', JSON.parse(DataHandler.readSync(TaskHistoryPath)));
+      MainWindow.webContents.send('add-task-to-list', JSON.parse(DataHandler.readSync(TASK_HISTORY_PATH)));
     }
   });
 
@@ -157,21 +162,7 @@ app.on('ready', () => {
 // Create input window to get new task info
 ipcMain.on('add-task', (event, data) => {
   console.log('Show window for task information input');
-  InputWindow = new BrowserWindow({
-    width: 300,
-    height: 80,
-    resizable: false,
-    center: true,
-    useContentSize: true,
-    frame: false,
-    backgroundColor: '#0f0f0f',
-    show: true,
-    webPreferences: { nodeIntegration: true },
-    enableRemoteModule: false,
-    parent: MainWindow,
-    autoHideMenuBar: true,
-    modal: true
-  });
+  InputWindow = new BrowserWindow(INPUT_WINDOW_CONFIG);
   InputWindow.loadFile('./src/subwindows/input_window.html');
 });
 
@@ -182,7 +173,7 @@ ipcMain.on('create-task', (event, data) => {
   data = data.trim();
   data = data.replace(/ /g, '-');
 
-  const currentTaskHistory = JSON.parse(DataHandler.readSync(TaskHistoryPath));
+  const currentTaskHistory = JSON.parse(DataHandler.readSync(TASK_HISTORY_PATH));
   const currentTime = new Date();
   const id = `task_${data}_${currentTime.getFullYear()}${currentTime.getMonth()}${currentTime.getDate()}`;
   // ID starts with 'task_' since HTML does not allow ID to start with a digit
@@ -198,7 +189,7 @@ ipcMain.on('create-task', (event, data) => {
   tempTask[id] = newTask;
   MainWindow.webContents.send('add-task-to-list', tempTask);
 
-  DataHandler.create(TaskHistoryPath, JSON.stringify(currentTaskHistory), (err) => {
+  DataHandler.create(TASK_HISTORY_PATH, JSON.stringify(currentTaskHistory), (err) => {
     if (err) dialog.showErrorBox('Error', `${err}\nError updating task history.`);
   });
 });
@@ -215,9 +206,9 @@ ipcMain.on('remove-task', (event, data) => {
     if (result.response === 1) {
       console.log('Remove task');
       // Delete from history
-      const taskHistory = JSON.parse(DataHandler.readSync(TaskHistoryPath));
+      const taskHistory = JSON.parse(DataHandler.readSync(TASK_HISTORY_PATH));
       delete taskHistory[data.id];
-      DataHandler.create(TaskHistoryPath, JSON.stringify(taskHistory), (err) => {
+      DataHandler.create(TASK_HISTORY_PATH, JSON.stringify(taskHistory), (err) => {
         if (err) dialog.showErrorBox('Error', `${err}\nFailed to remove task from task history.`);
       });
       // Remove from the renderer
@@ -231,9 +222,9 @@ ipcMain.on('remove-task', (event, data) => {
 // Complete a task and remove it from history
 ipcMain.on('complete-task', (event, data) => {
   console.log('Complete task');
-  const taskHistory = JSON.parse(DataHandler.readSync(TaskHistoryPath));
+  const taskHistory = JSON.parse(DataHandler.readSync(TASK_HISTORY_PATH));
   delete taskHistory[data];
-  DataHandler.create(TaskHistoryPath, JSON.stringify(taskHistory), (err) => {
+  DataHandler.create(TASK_HISTORY_PATH, JSON.stringify(taskHistory), (err) => {
     if (err) dialog.showErrorBox('Error', `${err}\nFailed to increment task completion count.`);
   });
 });
