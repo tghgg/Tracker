@@ -10,7 +10,7 @@ Vue.component('task', {
   data: function () {
     return { taskCompleted: this.completed };
   },
-  template: '<div class="task" :id="id"><button class="task-button" v-on:contextmenu="removeTask($event)" v-on:click="completeTask">{{ name }}</button><div class="task-tracker"><h3 v-if="taskCompleted">Done</h3><h3 v-else>X</h3></div></div>',
+  template: '<div class="task" :id="id" v-on:contextmenu="removeTask($event)"><button class="task-button"v-on:click="completeTask">{{ name }}</button><div class="task-tracker"><h3 v-if="taskCompleted">Done</h3><h3 v-else>X</h3></div></div>',
   methods: {
     completeTask: function () {
       this.taskCompleted = true;
