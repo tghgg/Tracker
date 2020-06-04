@@ -19,6 +19,7 @@
         "deb"
       ],
       "category": "Office",
+      "icon": "./assets/512x512.png",
       "executableName": "TuDu"
     },
     "win": {
@@ -31,8 +32,8 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "electron": "^8.3.1",
-    "electron-builder": "^22.6.1",
+    "electron": "^9.0.2",
+    "electron-builder": "^22.7.0",
     "semistandard": "^14.2.0"
   }
 }

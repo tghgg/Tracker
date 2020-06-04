@@ -15,7 +15,8 @@ const MAIN_WINDOW_CONFIG = {
   backgroundColor: '#1d1d1d',
   show: false,
   webPreferences: { nodeIntegration: true },
-  enableRemoteModule: false
+  enableRemoteModule: false,
+  icon: './assets/512x512.png'
 };
 
 const INPUT_WINDOW_CONFIG = {
