@@ -19,7 +19,7 @@
         "deb"
       ],
       "category": "Office",
-      "icon": "./assets/512x512.png",
+      "icon": "./assets/32x32.png",
       "executableName": "TuDu"
     },
     "win": {

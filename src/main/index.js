@@ -16,7 +16,7 @@ const MAIN_WINDOW_CONFIG = {
   show: false,
   webPreferences: { nodeIntegration: true },
   enableRemoteModule: false,
-  icon: './assets/512x512.png'
+  icon: '../../assets/32x32.png'
 };
 
 const INPUT_WINDOW_CONFIG = {
