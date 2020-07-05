@@ -4,7 +4,7 @@ html {
 
 .main {
     text-align: center;
-    font-family: 'Roboto', sans-serif;
+    font-family: Helvetica, sans-serif, Arial;
     color: white;
     text-align: center;
 }
@@ -15,7 +15,6 @@ form {
 
 input {
     color: white;
-    font-family: 'Roboto', sans-serif;
     background-color: #1d1d1d;
     border-style: groove;
     border-width: 1px;
@@ -38,7 +37,7 @@ button {
 	display:inline-block;
 	cursor:pointer;
 	color:#ffffff;
-	font-family: monospace, 'Roboto';
+	font-family: monospace, sans-serif, Arial;
 	font-size: 14px;
     text-decoration:none;
     margin-top: 15px;
@@ -50,4 +49,7 @@ button:hover {
 button:active {
 	position:relative;
 	top:1px;
+}
+button:focus {
+    outline: none;
 }
