@@ -4,19 +4,20 @@ const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
 const { join, extname } = require('path');
 
 const DataHandler = require('../../lib/data.js');
+const Promptr = require('../../lib/promptr/prompt.js');
 
 const TASK_HISTORY_PATH = join(app.getPath('userData'), 'tudu-tasks-history.json');
 
 let MainWindow, InputWindow;
 
 const MAIN_WINDOW_CONFIG = {
-  width: 800,
-  height: 600,
+  minWidth: 400,
+  minHeight: 600,
   backgroundColor: '#1d1d1d',
   show: false,
   webPreferences: { nodeIntegration: true },
-  enableRemoteModule: false,
-  icon: '../../assets/32x32.png'
+  enableRemoteModule: false
+  // icon: '../../assets/32x32.png'
 };
 
 const INPUT_WINDOW_CONFIG = {
@@ -34,7 +35,6 @@ const INPUT_WINDOW_CONFIG = {
   autoHideMenuBar: true,
   modal: true
 };
-
 
 const MENU = [
   {
@@ -126,7 +126,16 @@ const MENU = [
   }
 ];
 
-
+// Helpers
+function getCurrentTaskHistory () {
+  return JSON.parse(DataHandler.readSync(TASK_HISTORY_PATH));
+}
+function updateTaskHistory (newTaskHistory, errProcess = 'Something has gone wrong!') {
+  if (typeof (newTaskHistory) !== 'object') return new Error('New task history is of invalid type.');
+  DataHandler.update(TASK_HISTORY_PATH, JSON.stringify(newTaskHistory), (err) => {
+    if (err) dialog.showErrorBox('Error', `${err}\n${errProcess}`);
+  });
+}
 
 // Initialize app
 app.on('ready', () => {
@@ -170,7 +179,6 @@ ipcMain.on('add-task', (event, data) => {
 // Actually create the task, and add the task to task history
 ipcMain.on('create-task', (event, data) => {
   console.log('Add the task to task history and create the task');
-  InputWindow.close();
   data = data.trim();
   data = data.replace(/ /g, '-');
 
@@ -190,9 +198,7 @@ ipcMain.on('create-task', (event, data) => {
   tempTask[id] = newTask;
   MainWindow.webContents.send('add-task-to-list', tempTask);
 
-  DataHandler.create(TASK_HISTORY_PATH, JSON.stringify(currentTaskHistory), (err) => {
-    if (err) dialog.showErrorBox('Error', `${err}\nError updating task history.`);
-  });
+  updateTaskHistory(currentTaskHistory, 'Could not update task history.');
 });
 
 // Remove task from task history
@@ -209,9 +215,7 @@ ipcMain.on('remove-task', (event, data) => {
       // Delete from history
       const taskHistory = JSON.parse(DataHandler.readSync(TASK_HISTORY_PATH));
       delete taskHistory[data.id];
-      DataHandler.create(TASK_HISTORY_PATH, JSON.stringify(taskHistory), (err) => {
-        if (err) dialog.showErrorBox('Error', `${err}\nFailed to remove task from task history.`);
-      });
+      updateTaskHistory(taskHistory, 'Could not remove task from task history.');
       // Remove from the renderer
       MainWindow.webContents.send('remove-task-from-list', data.id);
     }
@@ -225,7 +229,28 @@ ipcMain.on('complete-task', (event, data) => {
   console.log('Complete task');
   const taskHistory = JSON.parse(DataHandler.readSync(TASK_HISTORY_PATH));
   delete taskHistory[data];
-  DataHandler.create(TASK_HISTORY_PATH, JSON.stringify(taskHistory), (err) => {
-    if (err) dialog.showErrorBox('Error', `${err}\nFailed to increment task completion count.`);
+  updateTaskHistory(taskHistory, 'Could not remove completed task from task history.');
+});
+
+ipcMain.handle('edit-task-name', (event, task) => {
+  return Promptr.prompt(task.name).then((newName) => {
+    // Update database
+    const CURRENT_HISTORY = getCurrentTaskHistory();
+
+    // Create a new key identical to the old task, just with a different name
+    const renamedTask = {};
+    // renamedTask[newName] = {};
+    Object.assign(renamedTask, CURRENT_HISTORY[task.id]);
+    renamedTask.name = newName;
+
+    // Modify the task history
+    CURRENT_HISTORY[task.id] = renamedTask;
+
+    // Update
+    updateTaskHistory(CURRENT_HISTORY, 'Could not rename a task in the task history.');
+
+    return newName;
+  }).catch(err => {
+    console.log(err);
   });
 });
